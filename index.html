@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>حاسبة قروض السيارات - شركة مسار اوتو لتجارة السيارات</title>
+    
+    <!-- إعدادات تطبيق الموبايل (PWA Manifest) -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22حاسبة%20قروض%20مسار%20أوتو%22%2C%22short_name%22%3A%22مسار%20أوتو%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F172A%22%2C%22theme_color%22%3A%22%230F172A%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F1006%2F1006771.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%252Fpng%22%7D%5D%7D">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- مكتبة تحويل HTML إلى PDF بنفس شكل الطباعة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #0F172A;
+            --accent-blue: #0284C7;
+            --accent-orange: #E85D24;
+            --card-bg: #FFFFFF;
+            --border-color: #CBD5E1;
+            --text-main: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #64748B;
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            direction: rtl;
+        }
+
+        .print-page {
+            max-width: 900px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .letterhead-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .top-left-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .brand-text-ar {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .brand-sub-ar {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-orange);
+            margin: 1px 0 0 0;
+        }
+
+        .geometric-shape-top {
+            width: 140px;
+            height: 18px;
+            background: #334155;
+            position: relative;
+            margin-bottom: 4px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 15% 100%);
+        }
+        .geometric-shape-top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 40px;
+            width: 45px;
+            height: 18px;
+            background: var(--accent-orange);
+        }
+
+        .top-right-logo {
+            text-align: left;
+        }
+
+        .company-tax-info {
+            font-size: 10px;
+            color: #64748B;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        .user-status-bar {
+            background: #0F172A;
+            color: #FFF;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 15px;
+        }
+
+        .section-box {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-align: center;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 7px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2px;
+            text-align: right;
+        }
+
+        .input-with-addon {
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #FFFFFF;
+        }
+
+        .input-with-addon input, .input-with-addon select, .input-with-addon textarea {
+            flex: 1;
+            padding: 5px 8px;
+            border: none;
+            font-size: 12px;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-with-addon textarea {
+            resize: vertical;
+            min-height: 70px;
+            line-height: 1.4;
+        }
+
+        .input-addon {
+            background: #E2E8F0;
+            padding: 5px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .note-text {
+            font-size: 10px;
+            color: var(--accent-blue);
+            margin-top: 1px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #FFFFFF;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .btn-print {
+            flex: 1;
+            background: #0F172A;
+            color: white;
+            border: none;
+            padding: 7px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-whatsapp {
+            flex: 1;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 7px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-schedule {
+            flex: 1;
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 7px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-add-new {
+            background: #0284C7;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .car-details-box {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-bottom: 7px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .results-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-main-installment {
+            background: #FFF7ED;
+            border: 2px solid var(--accent-orange);
+            border-radius: 6px;
+            padding: 7px;
+            text-align: center;
+        }
+        .card-main-installment .title { font-size: 11px; color: #9A3412; font-weight: bold; }
+        .card-main-installment .value { font-size: 16px; font-weight: 900; color: #C2410C; margin-top: 2px; }
+
+        .card-total-initial {
+            background: #FEFCE8;
+            border: 2px solid #CA8A04;
+            border-radius: 6px;
+            padding: 7px;
+            text-align: center;
+        }
+        .card-total-initial .title { font-size: 11px; color: #713F12; font-weight: bold; }
+        .card-total-initial .value { font-size: 13px; font-weight: 900; color: #854D0E; margin-top: 2px; }
+
+        .cards-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .mini-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-top: 3px solid var(--accent-blue);
+            border-radius: 4px;
+            padding: 5px 6px;
+            text-align: center;
+        }
+        .mini-card.dark-red { border-top-color: #DC2626; }
+        .mini-card.orange { border-top-color: var(--accent-orange); }
+
+        .mini-card .title { font-size: 10px; color: #64748B; font-weight: 600; }
+        .mini-card .value { font-size: 12px; font-weight: 800; color: var(--primary); margin-top: 1px; }
+
+        .terms-note {
+            margin-top: 8px;
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 10px;
+            color: #92400E;
+            line-height: 1.3;
+            text-align: right;
+        }
+
+        .schedule-box {
+            margin-top: 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px;
+            max-height: 95px;
+            overflow-y: auto;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .schedule-table th {
+            background: #F1F5F9;
+            color: var(--primary);
+            padding: 3px;
+            font-weight: 700;
+        }
+
+        .schedule-table td {
+            padding: 3px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .letterhead-footer {
+            margin-top: 12px;
+            border-top: 2px solid #0F172A;
+            background: #0F172A;
+            color: #FFFFFF;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .print-page { box-shadow: none; padding: 0; width: 100%; }
+            .actions-row, .btn-add-new, .print-hidden, .user-status-bar { display: none !important; }
+            @page { size: A4; margin: 8mm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="print-page" id="quotePage">
+    <div class="letterhead-top">
+        <div class="top-left-brand">
+            <div class="geometric-shape-top"></div>
+            <h2 class="brand-text-ar">مسار اوتو</h2>
+            <p class="brand-sub-ar">لتجارة السيارات</p>
+        </div>
+        <div class="top-right-logo">
+            <div class="company-tax-info" id="currentDateTimeDisplay" style="font-size: 11px; color: var(--primary); margin-bottom: 4px;"></div>
+            <div class="company-tax-info">سجل تجاري : 41145 | رقم التسجيل الضريبي: 766-658-066</div>
+        </div>
+    </div>
+
+    <!-- شريط حالة المستخدم وصلاحياته -->
+    <div class="user-status-bar" id="statusBar">
+        <span id="userRoleText">جاري التحقق من الصلاحيات...</span>
+        <button onclick="switchUserRole()" style="background:#E85D24; color:#FFF; border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:10px; font-weight:bold;">تبديل وضع المستخدم / الأدمن</button>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="section-box">
+            <div class="section-title">📊 بيانات السيارة والعميل</div>
+            
+            <div class="form-row-2">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>نوع السيارة 
+                        <span id="adminControls1">
+                            <button type="button" class="btn-add-new" onclick="addNewVehicle()">+ إضافة</button> 
+                        </span>
+                        <button type="button" class="btn-add-new" style="background:#0F172A;" onclick="printCarsList()">🖨️ الأسعار</button>
+                    </label>
+                    <div class="input-with-addon">
+                        <select id="vehicleType" onchange="onVehicleChange()"></select>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>عدد السيارات (الأسطول)</label>
+                    <div class="input-with-addon">
+                        <input type="number" id="carQuantity" value="1" min="1" oninput="calculate()">
+                        <span class="input-addon">سيارة</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 7px;">
+                <label>سعر السيارة الواحدة (كاش) <span id="priceEditNote" style="font-weight:normal; color:#64748B;">(للاعتماد والاطلاع)</span></label>
+                <div class="input-with-addon">
+                    <span class="input-addon">EGP</span>
+                    <input type="text" id="carPriceFormatted" value="0" oninput="formatAndSyncInput(this, 'carPrice')">
+                    <input type="hidden" id="carPrice" value="0">
+                </div>
+                <!-- زر تأكيد التعديل للأدمن -->
+                <div id="adminConfirmEditBox" class="print-hidden" style="margin-top: 4px; display: none; text-align: left;">
+                    <button type="button" onclick="confirmAdminPriceEdit()" style="background: #16a34a; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer;">✅ تأكيد اعتماد التعديل</button>
+                </div>
+            </div>
+
+            <div class="car-details-box" id="carDetailsBox">
+                <label style="margin-bottom: 2px; font-size:11px; font-weight:700; color:var(--primary);">
+                    وصف ومواصفات السيارة:
+                    <span id="adminControls2">
+                        <button type="button" class="btn-add-new" style="float: left; background: #16a34a;" onclick="saveCurrentVehicleEdits()">💾 حفظ التعديلات</button>
+                    </span>
+                </label>
+                <div class="input-with-addon" style="background: #F8FAFC; margin-top: 4px;">
+                    <textarea id="carDescText"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row-2">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>نسبة المقدم (%)</label>
+                    <div class="input-with-addon">
+                        <input type="number" id="downPaymentPct" value="25" min="0" max="100" oninput="onPctChange()">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>مبلغ المقدم للسيارة الواحدة (جنيه)</label>
+                    <div class="input-with-addon">
+                        <span class="input-addon">EGP</span>
+                        <input type="text" id="downPaymentAmountFormatted" value="0" oninput="formatAndSyncInput(this, 'downPaymentAmount', true)">
+                        <input type="hidden" id="downPaymentAmount" value="0">
+                    </div>
+                </div>
+            </div>
+            <div class="note-text" id="calculatedPctNote" style="margin-bottom: 7px;">النسبة تعادل: 25.00% من سعر السيارة</div>
+
+            <div class="form-row-2 print-hidden">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>الجهة التمويلية <span id="adminControls3"><button type="button" class="btn-add-new" onclick="addNewProvider()">+ إضافة</button></span></label>
+                    <div class="input-with-addon">
+                        <select id="provider" onchange="onProviderChange()">
+                            <option value="دريف (Drive)">دريف (Drive)</option>
+                            <option value="المصرف المتحد">المصرف المتحد</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>سعر الفائدة (%)</label>
+                    <div class="input-with-addon">
+                        <input type="number" id="customInterestRate" value="13" step="0.01" oninput="calculate()">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- خانة نسبة المصاريف الإدارية القابلة للتعديل والحفظ -->
+            <div class="form-row-2 print-hidden" style="margin-top: 7px;">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>نسبة المصاريف الإدارية (%)</label>
+                    <div class="input-with-addon">
+                        <input type="number" id="adminFeePctInput" value="2.5" step="0.01" min="0" max="100">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0; display: flex; align-items: flex-end;">
+                    <button type="button" class="btn-add-new" style="width: 100%; background: #16a34a; padding: 7px; font-size: 11px;" onclick="saveAdminFeePct()">💾 حفظ المصاريف</button>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 7px;">
+                <label>مدة القرض (بالشهور)</label>
+                <div class="input-with-addon">
+                    <input type="number" id="months" value="60" oninput="calculate()">
+                    <span class="input-addon">شهر</span>
+                </div>
+            </div>
+
+            <div class="toggle-container">
+                <label style="margin:0; cursor:pointer;">متضمن التأمين؟</label>
+                <input type="checkbox" id="hasInsurance" checked onchange="onInsuranceChange()" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-orange);">
+            </div>
+
+            <!-- إضافة خانة رقم واتساب العميل -->
+            <div class="input-group print-hidden" style="margin-top: 7px;">
+                <label>رقم واتساب العميل (للإرسال الفوري)</label>
+                <div class="input-with-addon">
+                    <span class="input-addon">📱</span>
+                    <input type="text" id="clientWhatsAppPhone" placeholder="010XXXXXXXX">
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-print" onclick="window.print()">🖨️ طباعة العرض</button>
+                <button class="btn-whatsapp" onclick="sendPdfViaWhatsApp()">💬 إرسال PDF للواتس</button>
+                <button class="btn-schedule" onclick="alert('تم استخراج جدول الأقساط')">تنزيل الجدول</button>
+            </div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">💎 النتائج والحسابات الختامية (إجمالي الأسطول)</div>
+
+            <div class="results-cards">
+                <div class="card-main-installment">
+                    <div class="title">إجمالي القسط الشهري للطلب بالكامل</div>
+                    <div class="value" id="resMonthly">-</div>
+                </div>
+
+                <div class="card-total-initial">
+                    <div class="title" id="resTotalInitialTitle">إجمالي المبلغ المطلوب كاش (المقدم + المصاريف + التأمين)</div>
+                    <div class="value" id="resTotalInitialCash">-</div>
+                </div>
+
+                <div class="cards-grid-2">
+                    <div class="mini-card">
+                        <div class="title">إجمالي المقدمات للسيارات</div>
+                        <div class="value" id="resDownPayment">-</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="title" id="resFeesTitle">المصاريف الإدارية والتأمين</div>
+                        <div class="value" id="resFeesAndIns">-</div>
+                    </div>
+                </div>
+
+                <div class="cards-grid-2">
+                    <div class="mini-card">
+                        <div class="title">إجمالي مبلغ القرض للسيارات</div>
+                        <div class="value" id="resLoanAmount">-</div>
+                    </div>
+                    <div class="mini-card print-hidden">
+                        <div class="title">إجمالي الفوائد</div>
+                        <div class="value" id="resTotalInterest">-</div>
+                    </div>
+                </div>
+
+                <div class="cards-grid-2">
+                    <div class="mini-card dark-red print-hidden">
+                        <div class="title">إجمالي تكلفة الأسطول</div>
+                        <div class="value" id="resTotalCost">-</div>
+                    </div>
+                    <div class="mini-card orange print-hidden">
+                        <div class="title">سعر فائدة (سنوية)</div>
+                        <div class="value" id="resInterestRate">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terms-note">
+                <strong>ملاحظة هامة:</strong> هذا العرض ساري لمدة ( ثلاثة أيام )، مع الأخذ في الاعتبار أن السعر قابل للتعديل وفقاً لأي مستجدات وقت التسليم النهائي.
+            </div>
+
+            <div class="schedule-box print-hidden">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>شهر</th>
+                            <th>القسط الإجمالي</th>
+                            <th>الفائدة الشهرية</th>
+                            <th>الباقي</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="letterhead-footer">
+        <div class="footer-hotline">
+            <span>Mohamed Abdallah: 010 80 100 600</span>
+        </div>
+        <div class="footer-branches" style="text-align: left; line-height: 1.3; color: #CBD5E1;">
+            الفرع الرئيسي: بنزينة نتل أوت الطيارة - محور سعد الدين الشاذلي - القاهرة<br>
+            فرع القليوبية: طنان قليوب - القليوبية
+        </div>
+    </div>
+</div>
+
+<script>
+let defaultVehicleData = {
+    "canter5": { 
+        name: "الفوزو 5 متر", 
+        price: 1450000, 
+        desc: "الفوزو 5 متر (ميتسوبيشي 4M42 4.2 لتر ديزل رباعي الأشواط ذو حقن مباشر، 120 حصان، 304 نيوتن، ناقل مانيوال 5 أمامي + 1 خلفي)." 
+    },
+    "canter4": { name: "الفوزو 4 متر", price: 1370000, desc: "الفوزو 4 متر - شاحنة نقل تجارية بمواصفات ممتازة." },
+    "canter3.80": { name: "الفوزو 3.80 متر", price: 1310000, desc: "الفوزو 3.80 متر - شاحنة تجارية لتحمل الشد والعمل الشاق." },
+    "minibus29": { name: "ميني باص 29 راكب", price: 3200000, desc: "ميكروباص 29 راكب - مجهز للنقل الجماعي والسياحي." },
+    "volvo": { name: "الفولفو", price: 11200000, desc: "الفولفو - 49 راكب." },
+    "mercedes": { name: "مرسيدس", price: 3000000, desc: "مرسيدس - سيارة نقل فاخرة وعالية الاعتمادية." },
+    "minibus11": { name: "KYC ", price: 700000, desc: "فان 11 راكب - مجهز للنقل الجماعي." },
+    "kinglong_carb": { name: "كينج لونج عادة انجيكشن بنزين", price: 988000, desc: "كينج لونج عادة انجيكشن بنزين - 14 راكب." },
+    "kinglong_inj": { name: "كينج لونج عادة كربيراتير بنزين", price: 999000, desc: "كينج لونج عادة كربيراتير بنزين - 14 راكب ." }
+};
+
+let isAdmin = localStorage.getItem('masar_is_admin') === 'true';
+
+function updateDateTimeHeader() {
+    let now = new Date();
+    let options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    let formatted = now.toLocaleDateString('ar-EG', options);
+    let el = document.getElementById('currentDateTimeDisplay');
+    if(el) el.innerText = "📅 التاريخ والوقت: " + formatted;
+}
+
+function applyRoleUI() {
+    let statusText = document.getElementById('userRoleText');
+    let controls1 = document.getElementById('adminControls1');
+    let controls2 = document.getElementById('adminControls2');
+    let controls3 = document.getElementById('adminControls3');
+    let priceInput = document.getElementById('carPriceFormatted');
+    let descInput = document.getElementById('carDescText');
+
+    if (isAdmin) {
+        statusText.innerHTML = "👤 وضع النظام: <strong>المدير (Admin)</strong> - لديك صلاحيات التعديل والإضافة الكاملة.";
+        if(controls1) controls1.style.display = 'inline';
+        if(controls2) controls2.style.display = 'inline';
+        if(controls3) controls3.style.display = 'inline';
+        if(priceInput) priceInput.removeAttribute('disabled');
+        if(descInput) descInput.removeAttribute('disabled');
+    } else {
+        statusText.innerHTML = "👁️ وضع النظام: <strong>مستخدم (User)</strong> - صلاحية اطلاع وحسابات فقط.";
+        if(controls1) controls1.style.display = 'none';
+        if(controls2) controls2.style.display = 'none';
+        if(controls3) controls3.style.display = 'none';
+        if(priceInput) priceInput.setAttribute('disabled', 'true');
+        if(descInput) descInput.setAttribute('disabled', 'true');
+    }
+}
+
+function switchUserRole() {
+    if (!isAdmin) {
+        let pass = prompt("أدخل كلمة مرور المدير (Admin Password):");
+        if (pass === "masar2026") {
+            isAdmin = true;
+            localStorage.setItem('masar_is_admin', 'true');
+            alert("تم تفعيل صلاحيات المدير بنجاح!");
+            applyRoleUI();
+        } else if (pass !== null) {
+            alert("كلمة المرور غير صحيحة!");
+        }
+    } else {
+        let confirmLeave = confirm("هل تريد التحويل لوضع المستخدم العادي؟");
+        if (confirmLeave) {
+            isAdmin = false;
+            localStorage.setItem('masar_is_admin', 'false');
+            applyRoleUI();
+        }
+    }
+}
+
+let savedVehicles = JSON.parse(localStorage.getItem('masar_vehicles')) || {};
+let vehicleData = Object.assign({}, defaultVehicleData, savedVehicles);
+
+function saveVehiclesToStorage() {
+    localStorage.setItem('masar_vehicles', JSON.stringify(vehicleData));
+}
+
+function initVehiclesDropdown() {
+    let select = document.getElementById('vehicleType');
+    let currentSelected = select.value;
+    select.innerHTML = "";
+    for (let key in vehicleData) {
+        let opt = document.createElement('option');
+        opt.value = key;
+        opt.text = vehicleData[key].name;
+        select.add(opt);
+    }
+    if (vehicleData[currentSelected]) {
+        select.value = currentSelected;
+    }
+}
+
+function formatNumberWithCommas(numStr) {
+    let clean = numStr.toString().replace(/[^\d]/g, '');
+    if (!clean) return '';
+    return Number(clean).toLocaleString('en-US');
+}
+
+function formatAndSyncInput(element, hiddenId) {
+    let rawVal = element.value.replace(/[^\d]/g, '');
+    element.value = formatNumberWithCommas(rawVal);
+    document.getElementById(hiddenId).value = rawVal;
+
+    if (hiddenId === 'carPrice') {
+        if (!isAdmin) return;
+        let confirmBox = document.getElementById('adminConfirmEditBox');
+        if (confirmBox) confirmBox.style.display = 'block';
+    } else if (hiddenId === 'downPaymentAmount') {
+        onAmountChange();
+    }
+}
+
+function confirmAdminPriceEdit() {
+    if (!isAdmin) return;
+    let rawVal = document.getElementById('carPrice').value;
+    let vehicle = document.getElementById('vehicleType').value;
+    
+    if (vehicleData[vehicle]) {
+        let basePrice = parseFloat(rawVal) || 0;
+        let provider = document.getElementById('provider').value;
+        if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+            basePrice -= 30000;
+        }
+        vehicleData[vehicle].price = basePrice;
+        saveVehiclesToStorage();
+        
+        let currentDesc = document.getElementById('carDescText').value;
+        vehicleData[vehicle].desc = currentDesc;
+        saveVehiclesToStorage();
+
+        alert("✅ تم تأكيد اعتماد وحفظ تعديل السعر بنجاح!");
+        let confirmBox = document.getElementById('adminConfirmEditBox');
+        if (confirmBox) confirmBox.style.display = 'none';
+        onPriceOrPctChange();
+        calculate();
+    }
+}
+
+function saveCurrentVehicleEdits() {
+    if (!isAdmin) {
+        alert("عذراً، هذا الحساب مخصص للاطلاع فقط.");
+        return;
+    }
+    let vehicle = document.getElementById('vehicleType').value;
+    let desc = document.getElementById('carDescText').value;
+    let currentInputPrice = parseFloat(document.getElementById('carPrice').value) || 0;
+
+    let provider = document.getElementById('provider').value;
+    if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+        currentInputPrice -= 30000;
+    }
+
+    if (vehicleData[vehicle]) {
+        vehicleData[vehicle].desc = desc;
+        vehicleData[vehicle].price = currentInputPrice;
+        saveVehiclesToStorage();
+        
+        let confirmBox = document.getElementById('adminConfirmEditBox');
+        if (confirmBox) confirmBox.style.display = 'none';
+
+        alert("تم حفظ التعديلات بنجاح!");
+        calculate();
+    }
+}
+
+function saveAdminFeePct() {
+    let feePct = parseFloat(document.getElementById('adminFeePctInput').value) || 0;
+    let provider = document.getElementById('provider').value;
+    localStorage.setItem('masar_admin_fee_' + provider, feePct);
+    alert("✅ تم حفظ نسبة المصاريف الإدارية لجهة " + provider + " بنجاح (" + feePct + "%)!");
+    calculate();
+}
+
+function loadAdminFeePct() {
+    let provider = document.getElementById('provider').value;
+    let savedFee = localStorage.getItem('masar_admin_fee_' + provider);
+    let feeInput = document.getElementById('adminFeePctInput');
+    
+    if (savedFee !== null) {
+        feeInput.value = savedFee;
+    } else {
+        if (provider.includes("المصرف المتحد")) {
+            feeInput.value = 2.5;
+        } else {
+            feeInput.value = 2.0;
+        }
+    }
+}
+
+function getCurrentCarPrice() {
+    return parseFloat(document.getElementById('carPrice').value) || 0;
+}
+
+function onPctChange() {
+    let carPrice = getCurrentCarPrice();
+    let dpPct = parseFloat(document.getElementById('downPaymentPct').value) || 0;
+    let dpAmount = Math.round((carPrice * dpPct) / 100);
+    
+    document.getElementById('downPaymentAmount').value = dpAmount;
+    document.getElementById('downPaymentAmountFormatted').value = formatNumberWithCommas(dpAmount);
+    document.getElementById('calculatedPctNote').innerText = "النسبة تعادل: " + dpPct.toFixed(2) + "% من سعر السيارة";
+    calculate();
+}
+
+function onAmountChange() {
+    let carPrice = getCurrentCarPrice();
+    let dpAmount = parseFloat(document.getElementById('downPaymentAmount').value) || 0;
+    let calculatedPct = carPrice > 0 ? (dpAmount / carPrice) * 100 : 0;
+    
+    document.getElementById('downPaymentPct').value = calculatedPct.toFixed(2);
+    document.getElementById('calculatedPctNote').innerText = "النسبة تعادل: " + calculatedPct.toFixed(2) + "% من سعر السيارة";
+    calculate();
+}
+
+function onPriceOrPctChange() {
+    onPctChange();
+}
+
+function onVehicleChange() {
+    let vehicle = document.getElementById('vehicleType').value;
+    let provider = document.getElementById('provider').value;
+    if (vehicleData[vehicle]) {
+        document.getElementById('carDescText').value = vehicleData[vehicle].desc;
+        let price = vehicleData[vehicle].price;
+
+        if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+            price += 30000;
+        }
+
+        document.getElementById('carPrice').value = price;
+        document.getElementById('carPriceFormatted').value = formatNumberWithCommas(price);
+        
+        let confirmBox = document.getElementById('adminConfirmEditBox');
+        if (confirmBox) confirmBox.style.display = 'none';
+    }
+    onProviderChange();
+}
+
+function onProviderChange() {
+    let provider = document.getElementById('provider').value;
+    let vehicle = document.getElementById('vehicleType').value;
+    let rateInput = document.getElementById('customInterestRate');
+    let hasInsurance = document.getElementById('hasInsurance').checked;
+
+    loadAdminFeePct();
+
+    if (vehicleData[vehicle]) {
+        let basePrice = vehicleData[vehicle].price;
+
+        if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+            basePrice += 30000;
+        }
+
+        document.getElementById('carPrice').value = basePrice;
+        document.getElementById('carPriceFormatted').value = formatNumberWithCommas(basePrice);
+    }
+
+    if (provider.includes("المصرف المتحد")) {
+        rateInput.value = 15.25;
+    } else if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+        let isFuso5Or4 = (vehicle === 'canter5' || vehicle === 'canter4');
+        let isFuso38OrMinibus = (vehicle === 'canter3.80' || vehicle === 'minibus29');
+
+        if (isFuso5Or4) {
+            rateInput.value = hasInsurance ? 13 : 14;
+        } else if (isFuso38OrMinibus) {
+            rateInput.value = hasInsurance ? 13 : 14; 
+        } else {
+            rateInput.value = hasInsurance ? 20.5 : 21.5;
+        }
+    }
+
+    onPctChange();
+}
+
+function onInsuranceChange() {
+    onProviderChange();
+}
+
+function addNewVehicle() {
+    if (!isAdmin) return;
+    let vName = prompt("أدخل اسم السيارة بالعربية:");
+    if (!vName) return;
+    vName = vName.trim();
+
+    let vPrice = parseFloat(prompt("أدخل سعر السيارة (كاش):", "3000000")) || 3000000;
+    let vDesc = prompt("أدخل وصف ومواصفات السيارة الثابتة:", vName + " - سيارة جديدة بمواصفات ممتازة.");
+    if (!vDesc) vDesc = vName;
+
+    let provider = document.getElementById('provider').value;
+    if (provider.includes("دريف") || provider.toLowerCase().includes("drive")) {
+        vPrice -= 30000;
+    }
+
+    let vKey = "car_" + Date.now();
+    vehicleData[vKey] = { name: vName, price: vPrice, desc: vDesc };
+    saveVehiclesToStorage();
+
+    initVehiclesDropdown();
+    document.getElementById('vehicleType').value = vKey;
+    onVehicleChange();
+}
+
+function addNewProvider() {
+    if (!isAdmin) return;
+    let pName = prompt("أدخل اسم جهة التمويل (مثال: بنك مصر):");
+    if (!pName) return;
+    pName = pName.trim();
+
+    let defaultRate = parseFloat(prompt("أدخل نسبة الفائدة السنوية للجهة الجديدة (مثال: 15.5):", "15.5")) || 15.5;
+
+    let select = document.getElementById('provider');
+    let opt = document.createElement('option');
+    opt.value = pName;
+    opt.text = pName;
+    select.add(opt);
+    select.value = pName;
+
+    document.getElementById('customInterestRate').value = defaultRate;
+    onProviderChange();
+}
+
+function printCarsList() {
+    let printWindow = window.open('', '_blank');
+    let provider = document.getElementById('provider').value;
+    let isDrive = provider.includes("دريف") || provider.toLowerCase().includes("drive");
+
+    let htmlContent = `
+        <html lang="ar" dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <title>كشف أسعار ومواصفات السيارات - شركة مسار</title>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; color: #334155; }
+                h2 { text-align: center; color: #0F172A; margin-bottom: 5px; }
+                p.sub { text-align: center; color: #E85D24; font-weight: bold; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+                th, td { border: 1px solid #CBD5E1; padding: 8px 12px; text-align: right; }
+                th { background: #0F172A; color: #FFFFFF; }
+                tr:nth-child(even) { background: #F8FAFC; }
+                .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #64748B; border-top: 1px solid #E2E8F0; padding-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <h2>شركة مسار للتجارة والاستثمار</h2>
+            <p class="sub">كشف أسعار ومواصفات السيارات المعتمدة للمراجعة (${provider})</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>اسم السيارة</th>
+                        <th>السعر (كاش)</th>
+                        <th>الوصف والمواصفات</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    let index = 1;
+    for (let key in vehicleData) {
+        let car = vehicleData[key];
+        let displayPrice = car.price;
+
+        if (isDrive) {
+            displayPrice += 30000;
+        }
+
+        htmlContent += `
+            <tr>
+                <td>${index++}</td>
+                <td><strong>${car.name}</strong></td>
+                <td>EGP ${displayPrice.toLocaleString('en-US')}</td>
+                <td>${car.desc}</td>
+            </tr>
+        `;
+    }
+
+    htmlContent += `
+                </tbody>
+            </table>
+            <div class="footer">تاريخ وطباعة التقرير: ${new Date().toLocaleString('ar-EG')} | قسم الحسابات والمبيعات</div>
+        </body>
+        </html>
+    `;
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); }, 500);
+}
+
+function calculate() {
+    let quantity = parseInt(document.getElementById('carQuantity').value) || 1;
+    if (quantity < 1) quantity = 1;
+
+    let unitCarPrice = getCurrentCarPrice();
+    let totalCarPrice = unitCarPrice * quantity;
+
+    let unitDownPayment = parseFloat(document.getElementById('downPaymentAmount').value) || 0;
+    let totalDownPayment = unitDownPayment * quantity;
+
+    let months = parseInt(document.getElementById('months').value) || 60;
+    let customRateInput = parseFloat(document.getElementById('customInterestRate').value) || 13;
+    let interestRate = customRateInput / 100;
+    let years = months / 12;
+
+    let adminFeePctInput = parseFloat(document.getElementById('adminFeePctInput').value) || 0;
+    let adminPct = adminFeePctInput / 100;
+    let adminExtraPerCar = 800;
+    
+    let hasInsurance = document.getElementById('hasInsurance').checked;
+    let insPct = 0.01;
+    let insExtraPerCar = 500;
+
+    let totalLoanAmount = totalCarPrice - totalDownPayment;
+    if (totalLoanAmount < 0) totalLoanAmount = 0;
+
+    let totalAdminFee = (totalLoanAmount * adminPct) + (adminExtraPerCar * quantity);
+    let totalInsuranceCost = hasInsurance ? (totalCarPrice * insPct) + (insExtraPerCar * quantity) : 0;
+    
+    let totalFeesAndIns = 0;
+    if (hasInsurance) {
+        totalFeesAndIns = totalAdminFee + totalInsuranceCost;
+        document.getElementById('resTotalInitialTitle').innerText = "إجمالي المبلغ المطلوب كاش (المقدم + المصاريف + التأمين للأسطول)";
+        document.getElementById('resFeesTitle').innerText = "إجمالي المصاريف والتأمين";
+    } else {
+        totalFeesAndIns = totalAdminFee;
+        document.getElementById('resTotalInitialTitle').innerText = "إجمالي المبلغ المطلوب كاش (المقدم + المصاريف الإدارية للأسطول)";
+        document.getElementById('resFeesTitle').innerText = "إجمالي المصروفات الإدارية";
+    }
+    
+    let totalInitialCash = totalDownPayment + totalFeesAndIns;
+
+    let totalInterest = totalLoanAmount * interestRate * years;
+    let totalLoanWithInterest = totalLoanAmount + totalInterest;
+    let monthlyInstallment = months > 0 ? (totalLoanWithInterest / months) : 0;
+    let totalCost = totalInitialCash + totalLoanWithInterest;
+
+    function format(num) {
+        return "EGP " + Math.round(num).toLocaleString('en-US');
+    }
+
+    document.getElementById('resMonthly').innerText = format(monthlyInstallment);
+    document.getElementById('resTotalInitialCash').innerText = format(totalInitialCash);
+    document.getElementById('resDownPayment').innerText = format(totalDownPayment);
+    document.getElementById('resFeesAndIns').innerText = format(totalFeesAndIns);
+    document.getElementById('resLoanAmount').innerText = format(totalLoanAmount);
+    document.getElementById('resTotalInterest').innerText = format(totalInterest);
+    document.getElementById('resTotalCost').innerText = format(totalCost);
+    document.getElementById('resInterestRate').innerText = (interestRate * 100).toFixed(2) + "%";
+
+    let tbody = document.getElementById('scheduleBody');
+    tbody.innerHTML = "";
+    let remaining = totalLoanWithInterest;
+    for (let i = 1; i <= Math.min(months, 4); i++) {
+        let monthlyInterest = totalInterest / months;
+        remaining -= monthlyInstallment;
+        let row = `<tr>
+            <td>${i}</td>
+            <td>${Math.round(monthlyInstallment).toLocaleString()}</td>
+            <td>${Math.round(monthlyInterest).toLocaleString()}</td>
+            <td>${Math.max(0, Math.round(remaining)).toLocaleString()}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    }
+}
+
+function sendPdfViaWhatsApp() {
+    let phoneInput = document.getElementById('clientWhatsAppPhone').value.trim();
+    if (!phoneInput) {
+        alert("يرجى إدخال رقم واتساب العميل أولاً!");
+        document.getElementById('clientWhatsAppPhone').focus();
+        return;
+    }
+
+    let cleanPhone = phoneInput.replace(/[^\d]/g, '');
+    if (cleanPhone.startsWith('0')) {
+        cleanPhone = '20' + cleanPhone.substring(1);
+    }
+
+    let hiddenElements = document.querySelectorAll('.print-hidden, .user-status-bar, .actions-row');
+    hiddenElements.forEach(el => el.style.visibility = 'hidden');
+
+    let element = document.getElementById('quotePage');
+    let vehicleSelect = document.getElementById('vehicleType');
+    let vehicleName = vehicleSelect.options[vehicleSelect.selectedIndex]?.text || "عرض_سعر";
+    let fileName = `عرض_سعر_${vehicleName.replace(/\s+/g, '_')}.pdf`;
+
+    let opt = {
+        margin:       [5, 5, 5, 5],
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        hiddenElements.forEach(el => el.style.visibility = 'visible');
+
+        let message = encodeURIComponent(`أهلاً بك، مرفق لحضرتك عرض السعر الخاص بشركة مسار للتجارة والاستثمار (${vehicleName}). برجاء الاطلاع على الملف المرفق.`);
+        let waUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+        window.open(waUrl, '_blank');
+    }).catch(err => {
+        hiddenElements.forEach(el => el.style.visibility = 'visible');
+        console.error(err);
+        alert("حدث خطأ أثناء توليد ملف الـ PDF!");
+    });
+}
+
+window.onload = function() {
+    updateDateTimeHeader();
+    applyRoleUI();
+    initVehiclesDropdown();
+    onVehicleChange();
+};
+</script>
+
+</body>
+</html>
