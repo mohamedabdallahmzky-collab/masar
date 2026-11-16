@@ -3,12 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>حاسبة قروض السيارات - شركة مسار اوتو لتجارة السيارات</title>
-    
-    <!-- إعدادات تطبيق الموبايل (PWA Manifest) -->
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22حاسبة%20قروض%20مسار%20أوتو%22%2C%22short_name%22%3A%22مسار%20أوتو%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F172A%22%2C%22theme_color%22%3A%22%230F172A%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F1006%2F1006771.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%252Fpng%22%7D%5D%7D">
-    <meta name="theme-color" content="#0F172A">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <!-- مكتبة تحويل HTML إلى PDF بنفس شكل الطباعة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -368,6 +362,19 @@
             font-size: 10px;
         }
 
+        /* تعديلات احترافية لتنسيق العرض على الموبايل والشاشات الصغيرة */
+        @media screen and (max-width: 768px) {
+            body { padding: 4px; }
+            .print-page { padding: 8px 10px; width: 100%; box-sizing: border-box; }
+            .dashboard-grid { grid-template-columns: 1fr !important; gap: 10px; }
+            .form-row-2 { grid-template-columns: 1fr !important; gap: 6px; }
+            .cards-grid-2 { grid-template-columns: 1fr 1fr; }
+            .letterhead-top { flex-direction: column; align-items: center; text-align: center; }
+            .top-right-logo { text-align: center; margin-top: 8px; }
+            .letterhead-footer { flex-direction: column; text-align: center; gap: 5px; }
+            .footer-branches { text-align: center !important; }
+        }
+
         @media print {
             body { background: none; padding: 0; }
             .print-page { box-shadow: none; padding: 0; width: 100%; }
@@ -383,7 +390,7 @@
         <div class="top-left-brand">
             <div class="geometric-shape-top"></div>
             <h2 class="brand-text-ar">مسار اوتو</h2>
-            <p class="brand-sub-ar">لتجارة السيارات</p>
+            <p class="brand-sub-ar">للتجارة السيارات</p>
         </div>
         <div class="top-right-logo">
             <div class="company-tax-info" id="currentDateTimeDisplay" style="font-size: 11px; color: var(--primary); margin-bottom: 4px;"></div>
